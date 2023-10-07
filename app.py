@@ -101,7 +101,6 @@ def show_posts():
     return render_template('index.html', title="Главная страница")
 
 
-# TODO доделать запрос сохранения данных после редактирования
 # маршрут для редактирования новости
 @app.route('/edit-post/<int:post_id>', methods=['POST', 'GET'])
 def edit_post(post_id):
@@ -114,8 +113,6 @@ def edit_post(post_id):
             return render_template('edit_post.html', title='Редактирование новости', post_data_edit=post_data_edit, image_folder=image_folder)
 
         if request.method == "POST":  # если post то
-            # TODO реализовать метод записи в базу данных
-
             print(request.form)  # просмотр в консоли данных отправленных из формы редактора
             title = request.form['title']
             alt_name_post = request.form['alt_name_post']
