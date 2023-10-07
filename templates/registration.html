@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+    <div class="px-4 py-1 my-1">
+        <img class="d-block mx-auto mb-4" src="{{ url_for('static', filename='images/newspaper.svg') }}" alt="" width="92" height="77">
+        <div class="display-5 fw-bold text-body-emphasis text-center mb-3">{{ title }}</div>
+
+        <!-- блок сообщений -->
+        {% for msg in get_flashed_messages() %}
+            <div class="alert alert-success" role="alert">
+                {{ msg }}
+            </div>
+        {% endfor %}
+        <!-- END блок сообщений -->
+
+        <form action="" method="post" class="row g-2">
+            {{ form.hidden_tag() }} {# Вставляем скрытое поле для CSRF-защиты #}
+
+            <!-- Поле имя -->
+            <div class="row ">
+                <div class="col-sm-6">
+                    {{ form.name_reg.label(class="form-label") }}
+                    {{ form.name_reg(class="form-control", placeholder="Ваше имя") }}
+                </div>
+            </div>
+
+            <!-- Поле пароль -->
+            <div class="row">
+                <div class="col-sm-6">
+                    {{ form.password_reg.label(class="form-label") }}
+                    <div class="input-group has-validation">
+                        {{ form.password_reg(class="form-control", placeholder="Пароль") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Поле почта -->
+            <div class="row">
+                <div class="col-sm-6">
+                    {{ form.email_reg.label(class="form-label") }}
+                    <div class="input-group has-validation">
+                        <span class="input-group-text" id="inputGroupPrepend">@</span>
+                        {{ form.email_reg(class="form-control", placeholder="Ваш е-мейл") }}
+                    </div>
+                    {% if form.email_reg.errors %}
+                        <div class="alert alert-success my-1" role="alert">
+                            {{ form.email_reg.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Поле кнопка -->
+            <div class="row">
+                <div class="col-12 py-2">
+                    <button class="btn btn-secondary" type="submit">Регистрация</button>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+
+{% endblock content %}
