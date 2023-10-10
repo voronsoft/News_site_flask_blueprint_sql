@@ -13,7 +13,7 @@
         </div>
         {% if session.get('group') == 1 %}
             <div class="card-footer text-body-secondary">
-                <a href="{{ url_for('edit_post', post_id=post_data['id']) }}" class="btn btn-secondary">Редактировать</a>
+                <a href="{{ url_for('admin.edit_post', post_id=post_data['id']) }}" class="btn btn-secondary">Редактировать</a>
             </div>
         {% endif %}
     </div>

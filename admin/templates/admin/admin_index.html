@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="ru" data-bs-theme="auto">
 <head>
-    <script src="{{ url_for('static', filename='js/jquery-3.7.0.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/color-modes.js') }}"></script>
+    <script src="{{ url_for('admin.static', filename='admin/js/jquery-3.7.0.min.js') }}"></script>
+    <script src="{{ url_for('admin.static', filename='admin/js/color-modes.js') }}"></script>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,9 +14,9 @@
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbar-fixed/">
 
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/docsearch.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='admin/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='admin/css/docsearch.css') }}">
+    <link rel="icon" href="{{ url_for('admin.static', filename='admin/images/favicon.ico') }}" type="image/x-icon">
 
     <!-- Стиль кнопки светлая тема -темная тема-->
     <style>
@@ -94,7 +94,7 @@
         }
     </style>
     <!-- END Стиль кнопки светлая тема -темная тема-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixed.css') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='admin/css/navbar-fixed.css') }}">
 </head>
 
 
@@ -234,7 +234,7 @@
 </main>
 
 <!-- Подключение скриптов Bootstrap, jquery и тд-->
-<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('admin.static', filename='admin/js/bootstrap.bundle.min.js') }}"></script>
 
 
 </body>
