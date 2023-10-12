@@ -100,10 +100,15 @@ def get_images(folder):
         print('папка найдена')
         print('------------')
 
-        # images = [os.path.normpath(os.path.join(folder_path, filename)) for filename in os.listdir(folder_path)]
-        images = [os.path.normpath(os.path.join(folder_path, filename)) for filename in os.listdir(folder_path_system)]
+        # список с загруженными изображениями
+        # ссылки формируются согласно HTML адресам (слеш /)
+        # images = [os.path.normpath(os.path.join(folder_path, filename)) for filename in os.listdir(folder_path_system)]
+        images = [(os.path.normpath(os.path.join(folder_path, filename))).replace('\\', '/') for filename in os.listdir(folder_path_system)]
         print('-----images---', images, len(images))
-        return jsonify({'images': images})
+        if len(images) > 0:
+            return jsonify({'images': images})
+        else:
+            return jsonify({'images': 'None'})
     else:
         print('такой папки нет')
         return jsonify({'images': 'None'})

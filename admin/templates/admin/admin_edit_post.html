@@ -8,22 +8,22 @@
 
     <script>
         tinymce.init({
+            relative_urls: false,
             selector: 'textarea#editor',
             plugins: 'image code',
             toolbar: 'undo redo | code | image',
             menubar: true,
             images_upload_url: '/admin/upload-image/{{ post_data_edit.id }}', // Вставляем значение id
-
         });
     </script>
     <script>
         tinymce.init({
+            relative_urls: false,
             selector: 'textarea#editor2',
             plugins: 'image code',
             toolbar: 'undo redo | code | image',
             menubar: true,
             images_upload_url: '/admin/upload-image/{{ post_data_edit.id }}', // Вставляем значение id
-
         });
     </script>
     <!-- END TinyMCE CDN -->
@@ -83,6 +83,9 @@
                                     type: 'GET', // Тип HTTP-запроса (GET в данном случае)
                                     dataType: 'json', // Ожидаемый тип данных в ответе (JSON)
                                     success: function (data) {
+                                        // Очистите содержимое контейнера с изображениями
+                                        $("#imageContainer").empty();
+
                                         // Функция, которая будет выполнена при успешном завершении запроса
                                         console.log('Путь к изображению:', data.images); // Вывод в консоль пути к изображениям
 
