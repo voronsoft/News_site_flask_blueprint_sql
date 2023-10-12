@@ -145,3 +145,9 @@ def upload_image(post_id):
         url = ('/' + current_app.config["UPLOADED_PHOTOS_DEST"] + '/' + filename).replace('\\', '/')
         print('url', url)
         return jsonify({'location': url}), 200
+
+
+# Маршрут Добавления новости
+@admin.route('/add-news', methods=['POST', 'GET'])
+def add_news():
+    return render_template('admin/admin_add_news.html', title="ADMIN-Добавление новости")
