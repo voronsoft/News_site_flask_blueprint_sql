@@ -8,12 +8,12 @@
 
     <script>
         tinymce.init({
+            relative_urls: false,
             selector: 'textarea#editor',
             plugins: 'image code',
             toolbar: 'undo redo | code | image',
             menubar: true,
             images_upload_url: '/admin/upload-image/{{ post_data_edit.id }}', // Вставляем значение id
-
         });
     </script>
     <script>
@@ -24,7 +24,6 @@
             toolbar: 'undo redo | code | image',
             menubar: true,
             images_upload_url: '/admin/upload-image/{{ post_data_edit.id }}', // Вставляем значение id
-
         });
     </script>
     <!-- END TinyMCE CDN -->
