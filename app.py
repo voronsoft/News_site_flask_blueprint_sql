@@ -60,11 +60,15 @@ def show_posts():
 
 @app.route('/full-post/<int:post_id>', methods=['POST', 'GET'])
 def full_post(post_id):
-    # Используем Session.get() вместо Query.get() (введение после версии 2.0 >)
-    post_data = db.session.get(Post, post_id)
+    if db.session.get(Post, post_id):
+        # Используем Session.get() вместо Query.get() (введение после версии 2.0 >)
+        post_data = db.session.get(Post, post_id)
 
-    # post_data = Post.query.get(post_id)
-    return render_template('full_post.html', title='Редактирование новости', post_data=post_data)
+        # post_data = Post.query.get(post_id)
+        return render_template('full_post.html', title='Редактирование новости', post_data=post_data)
+    else:
+        return "Такой новости не существует на сайте!!!"
+
 # ____________ END маршруты  для работы с новостями ____________
 
 

@@ -15,10 +15,10 @@ class Users(db.Model):
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    autor = db.Column(db.String(40), nullable=False, default='')
+    autor = db.Column(db.String(40), nullable=False, default='admin')
     date = db.Column(db.DateTime, nullable=False, default='2000-01-01 00:00:00')
     short_story = db.Column(db.Text, nullable=False)
     full_story = db.Column(db.Text, nullable=False)
     title = db.Column(db.String(255), nullable=False, default='')
-    descr = db.Column(db.String(300), nullable=False, default='')
+    descr = db.Column(db.String(300), nullable=False, default='Empty')
     alt_name = db.Column(db.String(190), nullable=False, default='')

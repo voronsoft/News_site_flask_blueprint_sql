@@ -3,7 +3,7 @@
 {% block content %}
     {% for post in posts %}
         <div class="alert alert-secondary" role="alert">
-            <a class="nav-link active" href="{{ url_for('admin.edit_post', post_id=post.id) }}">{{ post.title }}</a>
+            <a class="nav-link active" href="{{ url_for('admin.edit_post', post_id=post.id) }}">(id-{{ post.id }}) {{ post.title }}</a>
         </div>
     {% endfor %}
 {% endblock content %}

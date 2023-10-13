@@ -1,8 +1,10 @@
 import os
-
-from flask_uploads import UploadSet, IMAGES, configure_uploads
-
+import re
+import shutil
+from datetime import datetime
+from unidecode import unidecode
 from models import Users, Post, db
+from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, jsonify, send_from_directory, current_app
 
 admin = Blueprint('admin', __name__, template_folder="templates", static_folder="static")
@@ -86,7 +88,7 @@ def edit_post(post_id):
         return 'У вас нет прав для редактирования новостей!'
 
 
-# маршрут возвращает перечень путей к файлам изображений из папки новости
+# маршрут возвращает перечень путей к файлам изображений из папки новости для модального окна
 @admin.route('/get-images/<path:folder>')
 def get_images(folder):
     # путь к папке новости (формируется для проверки папки в файловой системе)
@@ -147,7 +149,121 @@ def upload_image(post_id):
         return jsonify({'location': url}), 200
 
 
+# ---------------------------------- маршруты для добавление новости ---------------------
 # Маршрут Добавления новости
 @admin.route('/add-news', methods=['POST', 'GET'])
 def add_news():
-    return render_template('admin/admin_add_news.html', title="ADMIN-Добавление новости")
+    image_folder = 'temp'
+
+    if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
+        if request.method == 'POST' and request.form['title']:
+            autor = session['user_name']  # берем имя пользователя из сессии
+            # Формируем дату
+            current_datetime = datetime.now()  # Получаем текущую дату и время
+            # Преобразуем текущую дату и время в нужный формат
+            formatted_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            date = str(formatted_date)
+
+            short_story = request.form['short_story']  # Короткая новость
+            full_story = request.form['full_story']  # Полная новость
+            title = request.form['title']  # Название новости
+            descr = ''  # Описание новости
+
+            #  формируем альтернативное название от названия новости из формы или исправляем если задано название пользователем
+            # из текста исключаются все спец символы только буквы и цифры допускаются
+            if request.form['alt_name_post']:
+                alt_name = request.form['alt_name_post'].strip().lower()  # убираем пробелы и делаем все прописными
+                alt_name = unidecode(re.sub(r'-+', '-', str(re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', alt_name).strip().replace(' ', '-'))))
+            else:
+                alt_name = request.form['title'].strip().lower()  # убираем пробелы и делаем все прописными
+                # убираем все лишние знаки - убираем пробелы в начале и конце - заменяем пробелы на дефис - убираем лишние дефисы - приводим в порядок текст
+                alt_name = unidecode(re.sub(r'-+', '-', str(re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', alt_name).strip().replace(' ', '-'))))
+
+            # записываем данные в БД
+            try:
+                post = Post(
+                    autor=autor,
+                    date=date,
+                    short_story=short_story,
+                    full_story=full_story,
+                    title=title,
+                    descr=descr,
+                    alt_name=alt_name,
+                )
+                db.session.add(post)  # добавляем объект в сессию
+                db.session.flush()  # перемещение записей из сессии в класс таблицы
+                db.session.commit()  # добавляем в таблицу записи из класса
+                print('id новой новости', post.id)
+
+                # ##########################
+                # Создаем постоянную папку для новости
+                permanent_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str(post.id))
+                print('permanent_folder', permanent_folder)
+                if not os.path.exists(permanent_folder):
+                    os.makedirs(permanent_folder)
+                    print('ПОСТОЯННАЯ папка новости создана')
+
+                # Перемещаем файлы из временной папки в постоянную
+                temp_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], 'temp')
+                for filename in os.listdir(temp_folder):
+                    source_path = os.path.join(temp_folder, filename)
+                    print('source_path-', source_path)
+                    dest_path = os.path.join(permanent_folder, filename)
+                    print('dest_path-',dest_path)
+                    shutil.move(source_path, dest_path)
+
+                # Удаляем временную папку после перемещения
+                shutil.rmtree(temp_folder, ignore_errors=True)
+                print('Папка temp по пути uploads/post/temp, была удалена, проверьте на всякий случай )))')
+                # ##########################
+
+                # Обновляем пути к изображениям в тексте новости
+                # Заменяем '/temp/' на f'/{post.id}/' в полном тексте новости и короткой новости
+                full_story = full_story.replace('/temp/', f'/{post.id}/')
+                short_story = short_story.replace('/temp/', f'/{post.id}/')
+
+                # Обновляем данные в БД
+                post.full_story = full_story
+                post.short_story = short_story
+                db.session.commit()
+
+                # Перенаправление на новую новость
+                return redirect(url_for('full_post', post_id=post.id))
+
+            except Exception as e:
+                # Обработка исключения или запись информации об ошибке
+                db.session.rollback()  # Откат изменений
+                flash('Ошибка при добавлении статьи: ' + str(e))  # Запись информации об ошибке
+                print('Ошибка при добавлении статьи: ', e)  # Вывод информации об ошибке в консоль
+
+    else:
+        return redirect(url_for('index'))
+
+    return render_template('admin/admin_add_news.html', title="ADMIN-Добавление новости", image_folder=image_folder)
+
+
+# Маршрут для загрузки изображений во временную папку
+@admin.route('/upload-temp-image', methods=['POST'])
+def upload_temp_image():
+    if 'file' not in request.files:
+        return jsonify({'message': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'message': 'No selected file'}), 400
+
+    if file:
+        # Создаём временную папку для загрузки изображений
+        # Создаём папку с названием id новости, если она не существует
+        temp_upload_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str('temp'))
+        print('Путь для создания временной папки в директории если ее нет: ', temp_upload_folder)
+        if not os.path.exists(temp_upload_folder):  # если папки нет то создаем папку
+            os.makedirs(temp_upload_folder)
+            print('Папка создана по пути: ', temp_upload_folder)
+
+        # Сохраняем файл с его оригинальным именем во временную папку
+        file.save(os.path.join(temp_upload_folder, file.filename))
+        # Возвращаем URL загруженного временного изображения
+        url = '/' + os.path.join(temp_upload_folder, file.filename).replace('\\', '/')
+        print('url', url)
+        return jsonify({'location': url}), 200

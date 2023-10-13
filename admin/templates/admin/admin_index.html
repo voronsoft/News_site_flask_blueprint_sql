@@ -186,7 +186,11 @@
                 {% endif %}
                 {% if session.get('group') == 1 %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('.show_posts') }}">Редактирование новостей</a>
+                        <a class="nav-link active" href="{{ url_for('.show_posts') }}">Ред-новостей</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('.add_news') }}">Add-новость</a>
                     </li>
 
                     <li class="nav-item">
