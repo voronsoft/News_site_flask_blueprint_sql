@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, session
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import timedelta
-from flask_paginate import Pagination  # импорт модуля пагинации
-from flask_uploads import UploadSet, configure_uploads, IMAGES
-from models import db, Users, Post  # импорт моделей представления таблиц
 import config_app  # импортируем настройки для приложения
 from admin.admin import admin
+from datetime import timedelta
+from models import db, Users, Post  # импорт моделей представления таблиц
+from flask_paginate import Pagination  # импорт модуля пагинации
 from forms import AuthorizationForm, RegistrationForm
+from flask_uploads import UploadSet, configure_uploads, IMAGES
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, url_for, flash, redirect, session
 
 # создаем приложение
 app = Flask(__name__)

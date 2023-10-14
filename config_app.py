@@ -16,3 +16,5 @@ DEBUG = True
 # Папка куда будут сохраняться изображения ( os.path.join('uploads', 'posts') такой формат используется для адаптации путей под разные ОС )
 UPLOADED_PHOTOS_DEST = os.path.join('static', 'uploads', 'posts')
 
+JSON_AS_ASCII = False
+
