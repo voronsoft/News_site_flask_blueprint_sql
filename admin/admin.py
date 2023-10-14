@@ -143,7 +143,6 @@ def upload_image(post_id):
 
         # записываем файл в директорию новости
         filename = photos.save(file, folder=str(post_id))  # возвращает расположение файла (12/valtek.png)
-        # url = os.path.normpath('/' + os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], filename))
         url = ('/' + current_app.config["UPLOADED_PHOTOS_DEST"] + '/' + filename).replace('\\', '/')
         print('url', url)
         return jsonify({'location': url}), 200

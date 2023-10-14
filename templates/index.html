@@ -201,6 +201,13 @@
 </nav>
 
 <main class="container border py-2">
+    <!-- блок сообщений -->
+    {% for msg in get_flashed_messages() %}
+        <div class="alert alert-danger" role="alert">
+            {{ msg|safe }}
+        </div>
+    {% endfor %}
+    <!-- END блок сообщений -->
     {% block content %}
         {% if 'user_name' not in session %}
             <div class="alert alert-danger my-2" role="alert">

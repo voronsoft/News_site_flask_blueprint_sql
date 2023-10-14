@@ -6,7 +6,6 @@ from flask_uploads import UploadSet, configure_uploads, IMAGES
 from models import db, Users, Post  # импорт моделей представления таблиц
 import config_app  # импортируем настройки для приложения
 from admin.admin import admin
-# импорт классов WTF из файла forms.py
 from forms import AuthorizationForm, RegistrationForm
 
 # создаем приложение
