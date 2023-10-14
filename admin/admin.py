@@ -209,7 +209,7 @@ def add_news():
                     source_path = os.path.join(temp_folder, filename)
                     print('source_path-', source_path)
                     dest_path = os.path.join(permanent_folder, filename)
-                    print('dest_path-',dest_path)
+                    print('dest_path-', dest_path)
                     shutil.move(source_path, dest_path)
 
                 # Удаляем временную папку после перемещения
@@ -267,3 +267,36 @@ def upload_temp_image():
         url = '/' + os.path.join(temp_upload_folder, file.filename).replace('\\', '/')
         print('url', url)
         return jsonify({'location': url}), 200
+
+
+# Маршрут Удаление новости
+@admin.route('/delete-news/<int:post_id>', methods=['POST'])
+def delete_news(post_id):
+    print(f'Удаление новости id: {post_id}')
+    # Получаем запись из базы данных по ID новости
+    post = Post.query.get(post_id)
+
+    try:
+        # Проверяем, существует ли такая новость
+        if post:
+            # Удаляем папку загрузки новости
+            folder_to_delete = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str(post.id))
+            print('folder_to_delete', folder_to_delete)
+
+            if os.path.exists(folder_to_delete):
+                shutil.rmtree(folder_to_delete, ignore_errors=True)
+
+            # Удаляем запись из базы данных
+            db.session.delete(post)
+            db.session.commit()
+
+            flash('Новость удалена из БД, папка изображений новости удалена')
+            return redirect(url_for('admin.show_posts'))
+
+    except Exception as e:
+        # Обработка исключения или запись информации об ошибке
+        db.session.rollback()  # Откат изменений
+        flash('Ошибка при удалении статьи: ' + str(e))  # Запись информации об ошибке
+        print('Ошибка при удалении статьи: ', e)  # Вывод информации об ошибке в консоль
+
+    return redirect(url_for('admin.show_posts'))

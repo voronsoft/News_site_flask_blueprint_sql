@@ -208,6 +208,14 @@
 </nav>
 
 <main class="container py-2 mt-3">
+    <!-- блок сообщений -->
+    {% for msg in get_flashed_messages() %}
+        <div class="alert alert-danger" role="alert">
+            {{ msg|safe }}
+        </div>
+    {% endfor %}
+    <hr>
+    <!-- END блок сообщений -->
     {% block content %}
         {% if 'user_name' in session and session.get('group') != 1 or 'user_name' not in session %}
             <div class="alert alert-danger my-2" role="alert">

@@ -2,8 +2,17 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     {% for post in posts %}
-        <div class="alert alert-secondary" role="alert">
-            <a class="nav-link active" href="{{ url_for('admin.edit_post', post_id=post.id) }}">(id-{{ post.id }}) {{ post.title }}</a>
+        <div class="row align-items-center">
+            <div class="col-10">
+                <div class="alert alert-secondary" role="alert">
+                    <a class="nav-link active" href="{{ url_for('admin.edit_post', post_id=post.id) }}"><b>(id-{{ post.id }}) {{ post.title }}</b></a>
+                </div>
+            </div>
+            <div class="col-2">
+                <form action="{{ url_for('admin.delete_news', post_id=post.id) }}" method="post">
+                    <button type="submit" id="delete-news" class="btn btn-danger mb-3">Удалить ?</button>
+                </form>
+            </div>
         </div>
     {% endfor %}
 {% endblock content %}
