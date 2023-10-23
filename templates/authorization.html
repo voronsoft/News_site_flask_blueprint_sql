@@ -8,14 +8,6 @@
         <img class="d-block mx-auto mb-4" src="{{ url_for('static', filename='images/newspaper.svg') }}" alt="" width="92" height="77">
         <div class="display-5 fw-bold text-body-emphasis text-center mb-3">{{ title }}</div>
 
-        <!-- блок сообщений -->
-        {% for msg in get_flashed_messages() %}
-            <div class="alert alert-success" role="alert">
-                {{ msg }}
-            </div>
-        {% endfor %}
-        <!-- END блок сообщений -->
-
         <form action="" method="post" class="row g-3">
             {{ form.hidden_tag() }} {# Вставляем скрытое поле для CSRF-защиты #}
 
@@ -47,14 +39,9 @@
                         {{ form.remember_me_log.label(class="form-label") }}
                         {{ form.remember_me_log(class="form-check-input", type="checkbox", value="True") }}
                     </div>
-{#                    <div class="form-check">#}
-{#                        <input class="form-check-input" type="checkbox" value="True" id="remember_me_log" name="remember_me">#}
-{#                        <label for="remember_me_log" class="form-label">запомнить меня</label>#}
-{#                    </div>#}
                 </div>
             </div>
 
-            <!-- Поле кнопка -->
             <div class="col-12">
                 <button class="btn btn-secondary" type="submit">Войти</button>
             </div>

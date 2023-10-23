@@ -13,7 +13,7 @@ admin = Blueprint('admin', __name__, template_folder="templates", static_folder=
 photos = UploadSet("photos", IMAGES)
 
 
-# главная страница админ-панели
+# Маршрут главная страница админ-панели
 @admin.route('/')
 def index():
     if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
@@ -25,7 +25,7 @@ def index():
     return render_template('admin/admin_index.html', title="Админ-панель")
 
 
-# маршрут списка пользователей сайта
+# Маршрут списка пользователей сайта
 @admin.route('/users')
 def users_show_all():
     if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
@@ -36,7 +36,7 @@ def users_show_all():
         return 'У вас нет прав для редактирования новостей!'
 
 
-# маршрут перечня новостей в админ панели
+# Маршрут перечня новостей в админ панели
 @admin.route('/show-posts')
 def show_posts():
     if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
@@ -47,26 +47,26 @@ def show_posts():
         return 'У вас нет прав для редактирования новостей!'
 
 
-# маршрут для редактирования новости
+# Маршрут для редактирования новости
 @admin.route('/edit-post/<int:post_id>', methods=['POST', 'GET'])
 def edit_post(post_id):
     if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
-        image_folder = post_id  # получаем путь к папке с изображениями
+        image_folder = post_id  # Получаем путь к папке с изображениями
         print('image_folder', image_folder)
-        post_data_edit = Post.query.filter_by(id=post_id).first()  # получаем объект с данными новости по id
+        post_data_edit = Post.query.filter_by(id=post_id).first()  # Получаем объект с данными новости по id
 
-        if request.method == 'GET':  # если get то передаем объект новости и его id
+        if request.method == 'GET':  # Если get то передаем объект новости и его id
             ...
             return render_template('admin/admin_edit_post.html', title='ADMIN-Редактирование новости', post_data_edit=post_data_edit, image_folder=image_folder)
 
-        if request.method == "POST":  # если post то
-            print('Данные из формы: ', request.form)  # просмотр в консоли данных отправленных из формы редактора
+        if request.method == "POST":  # Если post
+            print('Данные из формы: ', request.form)  # Просмотр в консоли данных отправленных из формы редактора
             title = request.form['title']
             alt_name_post = request.form['alt_name_post']
             full_story = request.form['editor']
             short_story = request.form['editor2']
 
-            # если пришли новые данные по post запросу то перезаписываем данные в БД
+            # Если пришли новые данные по post запросу то перезаписываем данные в БД
             try:
                 post_data_edit.title = title
                 post_data_edit.alt_name_post = alt_name_post
@@ -88,23 +88,22 @@ def edit_post(post_id):
         return 'У вас нет прав для редактирования новостей!'
 
 
-# маршрут возвращает перечень путей к файлам изображений из папки новости для модального окна
+# Маршрут возвращает перечень путей к файлам изображений из папки новости для модального окна
 @admin.route('/get-images/<path:folder>')
 def get_images(folder):
-    # путь к папке новости (формируется для проверки папки в файловой системе)
+    # Путь к папке новости (формируется для проверки папки в файловой системе)
     folder_path_system = os.path.normpath(current_app.config["BASE_DIR"] + '/' + os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], folder))
     print('Проверяем есть ли папка новости по пути folder_path_system: ', folder_path_system)
-    # путь к папке новости (формируется для отправки на сторону клиента в обработку скриптом модального окна)
+    # Путь к папке новости (формируется для отправки на сторону клиента в обработку скриптом модального окна)
     folder_path = os.path.normpath('/' + os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], folder))
     print('folder_path', folder_path)
-    # проверяем есть ли папка новости по пути
+    # Проверяем есть ли папка новости по пути
     if os.path.exists(folder_path_system):
         print('папка найдена')
         print('------------')
 
-        # список с загруженными изображениями
+        # Список с загруженными изображениями
         # ссылки формируются согласно HTML адресам (слеш /)
-        # images = [os.path.normpath(os.path.join(folder_path, filename)) for filename in os.listdir(folder_path_system)]
         images = [(os.path.normpath(os.path.join(folder_path, filename))).replace('\\', '/') for filename in os.listdir(folder_path_system)]
         print('-----images---', images, len(images))
         if len(images) > 0:
@@ -137,18 +136,18 @@ def upload_image(post_id):
         # Создаём папку с названием id новости, если она не существует
         upload_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str(post_id))
         print('Путь для создания папки в директории если ее нет: ', upload_folder)
-        if not os.path.exists(upload_folder):  # если папки нет то создаем папку
+        if not os.path.exists(upload_folder):  # Если папки нет то создаем папку
             os.makedirs(upload_folder)
             print('Папка создана по пути: ', upload_folder)
 
-        # записываем файл в директорию новости
-        filename = photos.save(file, folder=str(post_id))  # возвращает расположение файла (12/valtek.png)
+        # Записываем файл в директорию новости
+        filename = photos.save(file, folder=str(post_id))  # Возвращает расположение файла (12/valtek.png)
         url = ('/' + current_app.config["UPLOADED_PHOTOS_DEST"] + '/' + filename).replace('\\', '/')
         print('url', url)
         return jsonify({'location': url}), 200
 
 
-# ---------------------------------- маршруты для добавление новости ---------------------
+# ---------------------------------- Маршруты для добавление новости ---------------------
 # Маршрут Добавления новости
 @admin.route('/add-news', methods=['POST', 'GET'])
 def add_news():
@@ -156,7 +155,7 @@ def add_news():
 
     if 'user_name' in session and 'user_id' in session and 'group' in session and session.get('group') == 1:
         if request.method == 'POST' and request.form['title']:
-            autor = session['user_name']  # берем имя пользователя из сессии
+            autor = session['user_name']  # Берем имя пользователя из сессии
             # Формируем дату
             current_datetime = datetime.now()  # Получаем текущую дату и время
             # Преобразуем текущую дату и время в нужный формат
@@ -168,17 +167,17 @@ def add_news():
             title = request.form['title']  # Название новости
             descr = ''  # Описание новости
 
-            #  формируем альтернативное название от названия новости из формы или исправляем если задано название пользователем
+            # Формируем альтернативное название от названия новости из формы или исправляем если задано название пользователем
             # из текста исключаются все спец символы только буквы и цифры допускаются
             if request.form['alt_name_post']:
-                alt_name = request.form['alt_name_post'].strip().lower()  # убираем пробелы и делаем все прописными
+                alt_name = request.form['alt_name_post'].strip().lower()  # Убираем пробелы и делаем все прописными
                 alt_name = unidecode(re.sub(r'-+', '-', str(re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', alt_name).strip().replace(' ', '-'))))
             else:
-                alt_name = request.form['title'].strip().lower()  # убираем пробелы и делаем все прописными
-                # убираем все лишние знаки - убираем пробелы в начале и конце - заменяем пробелы на дефис - убираем лишние дефисы - приводим в порядок текст
+                alt_name = request.form['title'].strip().lower()  # Убираем пробелы и делаем все прописными
+                # Убираем все лишние знаки - убираем пробелы в начале и конце - заменяем пробелы на дефис - убираем лишние дефисы - приводим в порядок текст
                 alt_name = unidecode(re.sub(r'-+', '-', str(re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', alt_name).strip().replace(' ', '-'))))
 
-            # записываем данные в БД
+            # Записываем данные в БД
             try:
                 post = Post(
                     autor=autor,
@@ -189,9 +188,9 @@ def add_news():
                     descr=descr,
                     alt_name=alt_name,
                 )
-                db.session.add(post)  # добавляем объект в сессию
-                db.session.flush()  # перемещение записей из сессии в класс таблицы
-                db.session.commit()  # добавляем в таблицу записи из класса
+                db.session.add(post)  # Добавляем объект в сессию
+                db.session.flush()  # Перемещение записей из сессии в класс таблицы
+                db.session.commit()  # Добавляем в таблицу записи из класса
                 print('id новой новости', post.id)
 
                 # ##########################
@@ -230,7 +229,6 @@ def add_news():
                 return redirect(url_for('full_post', post_id=post.id))
 
             except Exception as e:
-                # Обработка исключения или запись информации об ошибке
                 db.session.rollback()  # Откат изменений
                 flash('Ошибка при добавлении статьи: ' + str(e))  # Запись информации об ошибке
                 print('Ошибка при добавлении статьи: ', e)  # Вывод информации об ошибке в консоль
@@ -256,7 +254,7 @@ def upload_temp_image():
         # Создаём папку с названием id новости, если она не существует
         temp_upload_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str('temp'))
         print('Путь для создания временной папки в директории если ее нет: ', temp_upload_folder)
-        if not os.path.exists(temp_upload_folder):  # если папки нет то создаем папку
+        if not os.path.exists(temp_upload_folder):  # Если папки нет то создаем папку
             os.makedirs(temp_upload_folder)
             print('Папка создана по пути: ', temp_upload_folder)
 

@@ -203,7 +203,7 @@
 </nav>
 
 <main class="container py-2 mt-3">
-    <!-- блок сообщений -->
+    <!-- Блок сообщений -->
     {% for msg in get_flashed_messages() %}
         <div class="alert alert-danger" role="alert">
             {{ msg|safe }}

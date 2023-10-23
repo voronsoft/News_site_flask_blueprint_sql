@@ -1,13 +1,12 @@
 import config_app
 from models import db, Post
-
 from flask import Flask, jsonify
 
-# создаем приложение
+# Создаем приложение
 api = Flask(__name__)
-# загружаем настройки для приложения из файла настроек
+# Загружаем настройки для приложения из файла настроек
 api.config.from_object(config_app)
-#  выполняет инициализацию объекта SQLAlchemy для Flask-приложения
+# Инициализируем объект SQLAlchemy для Flask-приложения
 db.init_app(api)
 
 

@@ -83,7 +83,7 @@
                                     type: 'GET', // Тип HTTP-запроса (GET в данном случае)
                                     dataType: 'json', // Ожидаемый тип данных в ответе (JSON)
                                     success: function (data) {
-                                        // Очистите содержимое контейнера с изображениями
+                                        // Очищаем содержимое контейнера с изображениями
                                         $("#imageContainer").empty();
 
                                         // Функция, которая будет выполнена при успешном завершении запроса
@@ -120,7 +120,7 @@
                                 });
                             }
 
-                            // При открытии модального окна вызывайте loadImages
+                            // При открытии модального окна вызываем loadImages
                             $("#openGalleryButton").click(function () {
                                 loadImages();
                             });
@@ -132,11 +132,10 @@
                                 // Вставляем изображение в активное место в TinyMCE
                                 tinymce.activeEditor.execCommand('mceInsertContent', false, '<img src="' + imageUrl + '" alt="Image">');
 
-                                // Закрываем модальное окно после вставки изображения (если необходимо)
+                                // Закрываем модальное окно после вставки изображения
                                 $('#exampleModal').modal('hide');
                             });
                         </script>
-
 
                         <br>
                         Короткая новость
@@ -152,6 +151,5 @@
             </div>
         </div>
     </div>
-
 
 {% endblock content %}
