@@ -1,0 +1,26 @@
+{% extends 'index.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+{% for p in posts %}
+<div class="card my-2">
+    <h5 class="card-header">
+        <a class="nav-link active" aria-current="page" href="#">{{ p.title }}</a>
+    </h5>
+    <div class="card-body">
+        <p class="card-text">{{ p.short_story | safe }}</p>
+        <a href="{{ url_for('full_post', post_id=p.id) }}" class="btn btn-secondary">Подробнее</a>
+    </div>
+    <div class="card-footer text-body-secondary"></div>
+</div>
+{% endfor %}
+
+<!-- пагинация страниц -->
+<div class="pagination">
+    {{ pagination.links }}
+</div>
+
+
+{% endblock content %}

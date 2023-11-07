@@ -1,0 +1,19 @@
+{% extends 'index.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="card my-2">
+        <h5 class="card-header">
+            <a class="nav-link active" aria-current="page" href="#">{{ post_data['title'] }}</a>
+        </h5>
+        <div class="card-body">
+            <p class="card-text">{{ post_data['full_story'] | safe }}</p>
+        </div>
+        {% if session.get('group') == 1 %}
+            <div class="card-footer text-body-secondary">
+                <a href="{{ url_for('admin.edit_post', post_id=post_data['id']) }}" class="btn btn-secondary">Редактировать</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,156 @@
+{% extends 'admin/admin_index.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+    <!-- TinyMCE CDN -->
+    <script src="https://cdn.tiny.cloud/1/7yrlp7kbq1flwcfyeqh4wdn7z9s0pqu9kkjc6dc8w09t5cpw/tinymce/6/tinymce.min.js" referrerpolicy="origin" xmlns="http://www.w3.org/1999/html"></script>
+
+    <script>
+        tinymce.init({
+            relative_urls: false,
+            selector: 'textarea#full_story',
+            plugins: 'image code',
+            toolbar: 'undo redo | code | image',
+            menubar: true,
+            images_upload_url: '/admin/upload-temp-image', // Путь к временной папке
+        });
+    </script>
+    <script>
+        tinymce.init({
+            relative_urls: false,
+            selector: 'textarea#short_story',
+            plugins: 'image code',
+            toolbar: 'undo redo | code | image',
+            menubar: true,
+            images_upload_url: '/admin/upload-temp-image', // Путь к временной папке
+        });
+    </script>
+    <!-- END TinyMCE CDN -->
+
+    <div class="container mt-4 mb-4">
+        <div class="row justify-content-md-center">
+            <div class="col-md-12 col-lg-8">
+
+                <form action="{{ url_for('admin.add_news') }}" method="post">
+                    <div class="form-group">
+
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="form-label mt-3 mb-0"><b>Название статьи:</b></label>
+                                <input type="text" id='title' name="title" class="form-control" value="" placeholder="" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label mb-0"><b>Альтернативное название:</b></label>
+                                <input type="text" id='alt_name_post' name="alt_name_post" class="form-control" value="" placeholder="Не обязательно. Сгенерируется автоматически">
+                            </div>
+                        </div>
+
+                        <!-- Кнопка для открытия модального окна -->
+                        <button type="button" class="btn btn-primary mt-2 mb-4" data-bs-toggle="modal" data-bs-target="#exampleModal" id="openGalleryButton">
+                            Галерея изображений
+                        </button>
+
+                        <!-- Модальное окно -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Изображения загруженные в папку новости</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="imageContainer">
+                                        <!-- Здесь будут выводиться изображения -->
+                                    </div>
+                                    <div class="modal-footer"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- JavaScript для загрузки и отображения изображений -->
+                        <script>
+                            // Определение переменной image_folder из шаблона
+                            const image_folder = "{{ image_folder }}"; // Используем значение из шаблона
+                            // Функция для загрузки изображений и обновления модального окна
+                            function loadImages() {
+                                // Выводим в консоль информацию о запросе к серверу
+                                console.log('Запрос к серверу по адресу:', '/admin/get-images/' + image_folder);
+
+                                $.ajax({
+                                    url: '/admin/get-images/' + image_folder, // URL-адрес, куда отправляется запрос
+                                    type: 'GET', // Тип HTTP-запроса (GET в данном случае)
+                                    dataType: 'json', // Ожидаемый тип данных в ответе (JSON)
+                                    success: function (data) {
+                                        // Очистите содержимое контейнера с изображениями
+                                        $("#imageContainer").empty();
+
+                                        // Функция, которая будет выполнена при успешном завершении запроса
+                                        console.log('Путь к изображению:', data.images); // Вывод в консоль пути к изображениям
+
+                                        if (data.images === 'None') {
+                                            // Если сервер вернул сообщение о том, что папка не найдена,
+                                            // отображаем это сообщение в модальном окне
+                                            $("#imageContainer").html('<p>ADD-Изображений для статьи в папке нет.</p>');
+                                        } else {
+                                            // Создаём карточку для каждого изображения и добавляем в контейнер
+                                            $.each(data.images, function (index, imageUrl) {
+                                                // Формирование HTML-кода для карточки изображения
+                                                const cardHtml = `
+                                                    <div class="card mb-2">
+                                                        <div class="card-header"></div>
+                                                        <div class="card-body">
+                                                            <img src="${imageUrl}" alt="Image" class="img-fluid">
+                                                        </div>
+                                                        <div class="card-footer text-body-secondary">
+                                                            <a href="#" class="btn btn-primary insert-image-btn" data-image-url="${imageUrl}">Вставить</a>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                                // Добавление карточки в контейнер
+                                                $("#imageContainer").append(cardHtml);
+                                            });
+                                        }
+                                    },
+                                    error: function (error) {
+                                        // Функция, которая будет выполнена в случае ошибки запроса
+                                        console.log('ошибка', error); // Вывод информации об ошибке в консоль браузера
+                                    }
+                                });
+                            }
+
+                            // При открытии модального окна вызываем loadImages
+                            $("#openGalleryButton").click(function () {
+                                loadImages();
+                            });
+
+                            // Обработчик события клика на кнопку "Вставить" в карточке
+                            $(document).on('click', '.insert-image-btn', function () {
+                                const imageUrl = $(this).data('image-url'); // Получаем URL изображения
+
+                                // Вставляем изображение в активное место в TinyMCE
+                                tinymce.activeEditor.execCommand('mceInsertContent', false, '<img src="' + imageUrl + '" alt="Image">');
+
+                                // Закрываем модальное окно после вставки изображения
+                                $('#exampleModal').modal('hide');
+                            });
+                        </script>
+
+
+                        <br>
+                        <b>Короткая новость</b>
+                        <textarea id="short_story" name="short_story"></textarea>
+                        <br>
+                        <hr>
+                        <b>Полная новость</b>
+                        <textarea id="full_story" name="full_story"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2 mb-2">Добавить новость</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
