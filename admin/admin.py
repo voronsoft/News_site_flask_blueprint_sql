@@ -167,7 +167,7 @@ def add_news():
             title = request.form['title']  # Название новости
             descr = ''  # Описание новости
 
-            # Формируем альтернативное название от названия новости из формы или исправляем если задано название пользователем
+            # Формируем альтернативное название новости, от названия новости из формы или исправляем если задано название пользователем
             # из текста исключаются все спец символы только буквы и цифры допускаются
             if request.form['alt_name_post']:
                 alt_name = request.form['alt_name_post'].strip().lower()  # Убираем пробелы и делаем все прописными
@@ -197,35 +197,38 @@ def add_news():
                 # Создаем постоянную папку для новости
                 permanent_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], str(post.id))
                 print('permanent_folder', permanent_folder)
+                # проверяем, если такой папки нет, то создаем
                 if not os.path.exists(permanent_folder):
                     os.makedirs(permanent_folder)
                     print('ПОСТОЯННАЯ папка новости создана')
 
-                # Перемещаем файлы из временной папки в постоянную
+                # Формируем путь к временной папке
+                # (перемещаем файлы из временной папки в постоянную)
                 temp_folder = os.path.join(current_app.config["UPLOADED_PHOTOS_DEST"], 'temp')
-                for filename in os.listdir(temp_folder):
-                    source_path = os.path.join(temp_folder, filename)
-                    print('source_path-', source_path)
-                    dest_path = os.path.join(permanent_folder, filename)
-                    print('dest_path-', dest_path)
-                    shutil.move(source_path, dest_path)
+                # проверка если такой папки нет (то-есть фото не загружались или фото для статьи нет)
+                if os.path.exists(temp_folder):
+                    # запускаем цикл для перемещения файлов из временной папки в постоянную папку новости
+                    for filename in os.listdir(temp_folder):
+                        source_path = os.path.join(temp_folder, filename)  # Создаем путь к исходному файлу
+                        dest_path = os.path.join(permanent_folder, filename)  # Создаем путь к месту назначения
+                        shutil.move(source_path, dest_path)  # Перемещаем файлы с временной папки в постоянную
 
-                # Удаляем временную папку после перемещения
-                shutil.rmtree(temp_folder, ignore_errors=True)
-                print('Папка temp по пути uploads/post/temp, была удалена, проверьте на всякий случай )))')
-                # ##########################
+                    # Удаляем временную папку после перемещения
+                    shutil.rmtree(temp_folder, ignore_errors=True)
+                    print('Папка temp по пути uploads/post/temp, была удалена, проверьте на всякий случай )))')
+                    # ##########################
 
-                # Обновляем пути к изображениям в тексте новости
+                # Обновляем пути к изображениям в тексте новости если файлы были перемещены
                 # Заменяем '/temp/' на f'/{post.id}/' в полном тексте новости и короткой новости
                 full_story = full_story.replace('/temp/', f'/{post.id}/')
                 short_story = short_story.replace('/temp/', f'/{post.id}/')
 
-                # Обновляем данные в БД
+                # Обновляем данные в БД с новыми путями к изображениям
                 post.full_story = full_story
                 post.short_story = short_story
                 db.session.commit()
 
-                # Перенаправление на новую новость
+                # Перенаправление на новую (созданную) новость
                 return redirect(url_for('full_post', post_id=post.id))
 
             except Exception as e:
