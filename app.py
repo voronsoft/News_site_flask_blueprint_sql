@@ -1,4 +1,5 @@
 import config_app  # импортируем настройки для приложения
+from flask_cors import CORS
 from admin.admin import admin
 from datetime import timedelta
 from models import db, Users, Post  # импорт моделей представления таблиц
@@ -6,10 +7,11 @@ from flask_paginate import Pagination  # импорт модуля пагина�
 from forms import AuthorizationForm, RegistrationForm
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, url_for, flash, redirect, session
+from flask import Flask, render_template, request, url_for, flash, redirect, session, jsonify
 
 # Создаем приложение
 app = Flask(__name__)
+CORS(app)
 # Загружаем настройки для приложения из файла настроек
 app.config.from_object(config_app)
 # Срок жизни сессии Например, 7 дней
@@ -76,7 +78,6 @@ def full_post(post_id):
 @app.route('/authorization', methods=['POST', 'GET'])
 def authorization():
     form_auth = AuthorizationForm()
-
     if form_auth.validate_on_submit():
         user = Users.query.filter_by(email=form_auth.email_log.data).first()
         if user and check_password_hash(user.psw, form_auth.pass_log.data):
@@ -90,11 +91,9 @@ def authorization():
                 app.permanent_session_lifetime = timedelta(days=30)  # Помним пользователя 7 дней
             else:
                 session.permanent = False  # Если не отмечен то после закрытия браузера сессия стирается
-
             return redirect(url_for('index'))
         else:
             flash('Неверный email или пароль')
-
     return render_template('authorization.html', title="Авторизация", form=form_auth)
 
 
@@ -141,6 +140,21 @@ def registration():
 
 
 # ____________ END маршруты  для работы с пользователями ____________
+
+
+# ------------ тестовый маршрут для запросов с внешнего сервера
+#  проверка настроек CORS
+# проверка запроса GET
+@app.route('/get_route', methods=['GET'])
+def get_route():
+    return jsonify({"message": "This is a test route!"})
+
+
+# Тестовый маршрут для POST-запроса
+@app.route('/post_route', methods=['POST'])
+def post_route():
+    data = request.json
+    return jsonify({"message": f"This is a POST route! Received data: {data}"})
 
 
 if __name__ == '__main__':
