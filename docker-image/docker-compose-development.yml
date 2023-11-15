@@ -60,4 +60,3 @@ services:
 # создаем том для хранения данных бд
 volumes:
   mysql_data:
-    
