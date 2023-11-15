@@ -8,7 +8,7 @@
         <img class="d-block mx-auto mb-4" src="{{ url_for('static', filename='images/newspaper.svg') }}" alt="" width="92" height="77">
         <div class="display-5 fw-bold text-body-emphasis text-center mb-3">{{ title }}</div>
 
-        <form action="" method="post" class="row g-2">
+        <form action="{{ url_for('registration') }}" method="post" class="row g-2">
             {{ form.hidden_tag() }} {# Вставляем скрытое поле для CSRF-защиты #}
 
             <!-- Поле имя -->
